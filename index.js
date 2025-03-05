@@ -12,6 +12,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const carRoutes = require('./routes/carRoutes');
 const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -21,6 +22,7 @@ app.use(express.json());
 // Basic route
 app.use("/", carRoutes)
 app.use("/", userRoutes)
+app.use("/", authRoutes)
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
