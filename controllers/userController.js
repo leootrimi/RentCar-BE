@@ -56,7 +56,7 @@ exports.getPersonalDetails = async (req, res) => {
                 message: 'Personal details not found for this user',
             });
         }
-
+        console.log(personalDetails)
         res.status(200).json({
             personalDetails: personalDetails,
         });

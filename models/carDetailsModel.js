@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const carDetailsSchema = new Schema({
     carName: { type: String },
+    carType: { type: String },
     imageURL: { type: String },
     engineHP: { type: Number },
     transmission: { type: String },

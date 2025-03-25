@@ -3,7 +3,8 @@ const CarDetails = require('../models/carDetailsModel');
 exports.createCar = async (req, res) => {
   try {
     const { 
-      carName, 
+      carName,
+      carType, 
       imageURL, 
       engineHP, 
       transmission, 
@@ -25,6 +26,7 @@ exports.createCar = async (req, res) => {
 
     const newCar = await CarDetails.create({
       carName,
+      carType,
       imageURL,
       engineHP,
       transmission,
