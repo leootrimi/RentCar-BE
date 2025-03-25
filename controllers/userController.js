@@ -58,9 +58,7 @@ exports.getPersonalDetails = async (req, res) => {
         }
 
         res.status(200).json({
-            success: true,
-            message: 'Personal details retrieved successfully',
-            data: personalDetails,
+            personalDetails: personalDetails,
         });
     } catch (error) {
         console.error(error);
