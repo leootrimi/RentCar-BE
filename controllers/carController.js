@@ -1,5 +1,6 @@
 const CarDetails = require("../models/carDetailsModel");
 const cloudinary = require("../config/cloudinaryConfig");
+const fs = require('fs');
 
 exports.createCar = async (req, res) => {
   try {
@@ -33,6 +34,7 @@ exports.createCar = async (req, res) => {
           unique_filename: false,
         });
         uploadedImageURL = result.secure_url;
+        
         fs.unlinkSync(req.file.path);
       } catch (uploadError) {
         throw new Error("Cloudinary upload failed: " + uploadError.message);
