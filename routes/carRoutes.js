@@ -1,11 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const carController = require('../controllers/carController');
+const carController = require("../controllers/carController");
+const upload = require("../middleware/upload");
 
-router.get('/cars', carController.getAllCars);
-router.get('/cars/:id', carController.getCarById);
-router.post('/cars', carController.createCar);
-router.put('/cars/:id', carController.updateCar);
-router.delete('/cars/:id', carController.deleteCar);
+router.post("/cars", upload.single("image"), carController.createCar);
+router.get("/cars", carController.getAllCars);
 
 module.exports = router;

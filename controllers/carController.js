@@ -1,57 +1,79 @@
-const Car = require('../models/carModel');
-
-exports.getAllCars = async (req, res) => {
-  try {
-    const cars = await Car.getAll();
-    res.status(200).json(cars);
-  } catch (err) {
-    throw new Error('Failed to fetch cars: ' + err.message);
-  }
-};
-
-exports.getCarById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const car = await Car.getById(id);
-    if (!car) return res.status(404).json({ error: 'Car not found' });
-    res.status(200).json(car);
-  } catch (err) {
-    throw new Error('Failed to fetch car: ' + err.message);
-  }
-};
+const CarDetails = require("../models/carDetailsModel");
+const cloudinary = require("../config/cloudinaryConfig");
+const fs = require('fs');
 
 exports.createCar = async (req, res) => {
   try {
-    const { make, model, year, price_per_day } = req.body;
-    if (!make || !model || !price_per_day) {
-      return res.status(400).json({ error: 'Make, model, and price_per_day are required' });
+    const {
+      carName,
+      carType,
+      imageURL,
+      engineHP,
+      transmission,
+      carSize,
+      seatNumber,
+      baggage,
+      petrol,
+      price,
+      discount,
+      numberOfDays,
+    } = req.body;
+
+    if (!carName || !price || !numberOfDays) {
+      return res
+        .status(400)
+        .json({ error: "carName, price, and numberOfDays are required" });
     }
-    const newCar = await Car.create({ make, model, year, price_per_day });
-    res.status(201).json(newCar);
+
+    let uploadedImageURL = imageURL;
+    if (req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "cars",
+          use_filename: true,
+          unique_filename: false,
+        });
+        uploadedImageURL = result.secure_url;
+        
+        fs.unlinkSync(req.file.path);
+      } catch (uploadError) {
+        throw new Error("Cloudinary upload failed: " + uploadError.message);
+      }
+    }
+
+    const priceAfterDiscount = price - (price * (discount || 0)) / 100;
+    const totalPrice = priceAfterDiscount * numberOfDays;
+
+    const newCar = await CarDetails.create({
+      carName,
+      carType,
+      imageURL: uploadedImageURL,
+      engineHP,
+      transmission,
+      carSize,
+      seatNumber,
+      baggage,
+      petrol,
+      price,
+      discount,
+      priceAfterDiscount,
+      numberOfDays,
+      totalPrice,
+    });
+
+    res
+      .status(201)
+      .json({ message: "Car details saved successfully", car: newCar });
   } catch (err) {
-    throw new Error('Failed to create car: ' + err.message);
+    res.status(500).json({ error: "Failed to create car: " + err.message });
   }
 };
 
-exports.updateCar = async (req, res) => {
+exports.getAllCars = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { make, model, year, price_per_day } = req.body;
-    const updatedCar = await Car.update(id, { make, model, year, price_per_day });
-    if (!updatedCar) return res.status(404).json({ error: 'Car not found' });
-    res.status(200).json(updatedCar);
+    const cars = await CarDetails.find();
+    res.status(200).json(cars);
   } catch (err) {
-    throw new Error('Failed to update car: ' + err.message);
-  }
-};
-
-exports.deleteCar = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deleted = await Car.delete(id);
-    if (!deleted) return res.status(404).json({ error: 'Car not found' });
-    res.status(204).send();
-  } catch (err) {
-    throw new Error('Failed to delete car: ' + err.message);
+    console.log(err.message);
   }
 };
